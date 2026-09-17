@@ -523,3 +523,175 @@ resultado = (
 | Crear columnas | asignación, `assign()`, `np.select()` |
 
 > **Regla de oro:** explora primero (`head`, `info`, `describe`, nulos y duplicados), transforma después y valida el resultado al final.
+
+---
+
+## 18. Funciones como valores: `map`, `apply`, `lambda` y funciones propias
+
+En Pandas muchas funciones reciben **argumentos** entre paréntesis. Algunos argumentos son valores normales (`axis=1`, `ascending=False`) y otros pueden ser **funciones**. Cuando una función se pasa como argumento para que Pandas la ejecute después, se suele llamar *callback*.
+
+### 18.1 Argumentos normales y argumentos con nombre
+
+```python
+# "Puntuacion" es un valor que indica la columna.
+# ascending=False es un valor booleano que indica el orden.
+df.sort_values("Puntuacion", ascending=False)
+
+# Los argumentos con nombre hacen el código más claro.
+df.drop(columns=["Ciudad"], axis=1)
+
+# *args recibe varios valores separados por comas.
+# **kwargs recibe opciones escritas como nombre=valor.
+```
+
+- **Posicional:** `df.head(10)` → `10` se asigna al primer parámetro.
+- **Con nombre:** `df.head(n=10)` → se indica explícitamente el parámetro.
+- **Lista o diccionario:** `df.drop(columns=["A", "B"])` recibe varios nombres.
+- **Booleano:** `ascending=True` o `False` activa o desactiva una opción.
+
+### 18.2 `lambda`: función pequeña de una sola expresión
+
+```python
+# Estructura: lambda argumento: resultado
+cuadrado = lambda numero: numero ** 2
+cuadrado(4)  # 16
+
+# La función se crea y se usa como argumento en la misma línea.
+df["Puntuacion_Doble"] = df["Puntuacion"].map(lambda valor: valor * 2)
+```
+
+Para operaciones sencillas suele ser más legible escribir directamente la operación:
+
+```python
+df["Puntuacion_Doble"] = df["Puntuacion"] * 2
+```
+
+### 18.3 `map`: aplicar una función o traducción a cada valor de una Serie
+
+```python
+# Con un diccionario: sustituye cada valor por su correspondencia.
+codigos = {"Madrid": "MAD", "Barcelona": "BCN"}
+df["codigo_ciudad"] = df["Ciudad"].map(codigos)
+
+# Con una función: recibe un valor cada vez.
+df["nombre_mayusculas"] = df["Nombre"].map(str.upper)
+
+# Con lambda: transforma cada puntuación.
+df["puntuacion_redondeada"] = df["Puntuacion"].map(lambda x: round(x, 1))
+```
+
+> Si un valor no aparece en el diccionario, `map` produce `NaN`. Para reemplazos parciales sin perder el valor original, suele ser mejor `replace()`.
+
+### 18.4 `apply`: aplicar una función a una Serie o a cada fila/columna
+
+```python
+# En una Serie: recibe cada valor.
+df["tipo_edad"] = df["Edad"].apply(
+    lambda edad: "adulto" if edad >= 18 else "menor"
+)
+
+# En un DataFrame, axis=0 trabaja columna a columna (por defecto).
+maximos = df[["Edad", "Puntuacion"]].apply(max)
+
+# axis=1 trabaja fila a fila; cada fila llega como una Serie.
+df["resumen"] = df.apply(
+    lambda fila: f"{fila['Nombre']} - {fila['Ciudad']}",
+    axis=1,
+)
+```
+
+- `axis=0`: la función recibe cada **columna**.
+- `axis=1`: la función recibe cada **fila**.
+
+Usa antes operaciones vectorizadas (`+`, `*`, `.str`, `.dt`, `np.select`) porque normalmente son más rápidas y claras que `apply`.
+
+### 18.5 Funciones propias como argumentos
+
+```python
+def clasificar_puntuacion(valor):
+    if valor >= 9:
+        return "Sobresaliente"
+    if valor >= 7:
+        return "Notable"
+    if valor >= 5:
+        return "Aprobado"
+    return "Suspenso"
+
+# Se pasa el nombre de la función, sin paréntesis.
+df["Categoria"] = df["Puntuacion"].apply(clasificar_puntuacion)
+
+# Incorrecto si se quiere que Pandas la aplique después:
+# df["Categoria"] = df["Puntuacion"].apply(clasificar_puntuacion())
+```
+
+`clasificar_puntuacion` se pasa sin `()` porque `apply` necesita recibir la función. Los paréntesis la ejecutarían inmediatamente.
+
+### 18.6 `agg`: pasar una o varias funciones de resumen
+
+```python
+# Una función de texto como valor.
+resumen = df.groupby("Ciudad")["Puntuacion"].agg("mean")
+
+# Varias funciones mediante una lista.
+resumen = df.groupby("Ciudad")["Puntuacion"].agg(["mean", "max", "min"])
+
+# Funciones propias y nombres de salida.
+def amplitud(serie):
+    return serie.max() - serie.min()
+
+resumen = df.groupby("Ciudad").agg(
+    media=("Puntuacion", "mean"),
+    maximo=("Puntuacion", "max"),
+    amplitud=("Puntuacion", amplitud),
+)
+```
+
+En `agg`, la función recibe normalmente una **Serie que contiene todo el grupo**, no un valor individual. Por eso `max()` y `min()` tienen sentido ahí.
+
+### 18.7 `transform` y `filter` con funciones
+
+```python
+# transform recibe cada grupo y debe devolver un resultado compatible
+# con el número de filas original.
+def restar_media(grupo):
+    return grupo - grupo.mean()
+
+df["diferencia"] = df.groupby("Ciudad")["Puntuacion"].transform(restar_media)
+
+# filter recibe un grupo y debe devolver True o False.
+# Conserva ciudades cuya puntuación media sea al menos 7.
+ciudades_buenas = df.groupby("Ciudad").filter(
+    lambda grupo: grupo["Puntuacion"].mean() >= 7
+)
+```
+
+### 18.8 `assign` y `pipe` con funciones
+
+```python
+# En assign, lambda recibe el DataFrame que existe en ese momento.
+resultado = df.assign(
+    total=lambda tabla: tabla["unidades"] * tabla["precio"]
+)
+
+# pipe pasa el DataFrame completo a una función propia.
+def limpiar_nombres(tabla):
+    copia = tabla.copy()
+    copia["Nombre"] = copia["Nombre"].str.strip().str.title()
+    return copia
+
+limpio = df.pipe(limpiar_nombres)
+```
+
+### Regla rápida para elegir
+
+| Necesidad | Opción |
+|---|---|
+| Sustituir valores con un diccionario | `map()` o `replace()` |
+| Transformar cada valor de una Serie | `map()` |
+| Usar varias columnas de cada fila | `apply(axis=1)` |
+| Resumir grupos | `groupby().agg()` |
+| Añadir un resultado del mismo tamaño | `groupby().transform()` |
+| Conservar grupos completos | `groupby().filter()` |
+| Encadenar una función sobre todo el DataFrame | `pipe()` |
+
+> **Idea clave:** `funcion(valor)` ejecuta una función; `apply(funcion)` le entrega la función a Pandas para que la ejecute muchas veces. En general, no pongas paréntesis al pasar una función como argumento.
