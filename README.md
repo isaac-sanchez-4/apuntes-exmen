@@ -1,36 +1,36 @@
 # 📘 Guía definitiva de Scala: desde cero hasta nivel examen
 
-Guía práctica para aprender los fundamentos de Scala paso a paso. Los ejemplos están pensados para copiar, pegar y repasar directamente.
+Guía práctica para aprender Scala paso a paso. Los ejemplos están explicados con detalle para poder copiarlos, probarlos y repasarlos antes del examen.
 
-> **Nota:** Los ejemplos son compatibles con Scala 2 y, salvo pequeños detalles de sintaxis, también con Scala 3.
+> **Nota:** Los ejemplos funcionan en Scala 2 y, salvo pequeños detalles de sintaxis, también en Scala 3.
 
 ---
 
 ## 1. Variables: ¿cómo guardamos datos?
 
-En Scala hay dos formas principales de crear una variable: `val`, que es inmutable, y `var`, que es mutable.
+Una variable es como una caja donde guardamos un dato. En Scala podemos crear cajas que no cambian (`val`) y cajas cuyo contenido podemos reasignar (`var`).
 
 ### `val`: valor inmutable
 
 Un `val` no puede apuntar a otro valor después de inicializarse. Es la opción recomendada siempre que sea posible.
 
 ```scala
-// Sin especificar el tipo: Scala lo infiere automáticamente
+// Scala deduce automáticamente los tipos
 val nombre = "Alex"
 val edad = 20
 
-// Con tipo explícito: puede hacer el código más claro
+// También podemos escribir el tipo explícitamente
 val ciudad: String = "Madrid"
 val nota: Double = 8.5
 
 // edad = 21 // ERROR: un val no se puede reasignar
 ```
 
-> Que un `val` sea inmutable significa que no se puede reasignar la variable. Si contiene una colección mutable, el contenido puede tener un comportamiento distinto; por eso conviene preferir colecciones inmutables.
+Que un `val` sea inmutable significa que no podemos reasignar la variable. Por eso se recomienda usarlo por defecto.
 
 ### `var`: variable mutable
 
-Un `var` sí puede reasignarse. Se utiliza cuando el valor tiene que cambiar, por ejemplo, en un contador o acumulador.
+Un `var` sí puede reasignarse. Se usa cuando el valor tiene que cambiar, por ejemplo, en un contador o acumulador.
 
 ```scala
 var puntuacion: Int = 0
@@ -40,7 +40,7 @@ puntuacion += 5
 println(puntuacion) // 15
 ```
 
-**Regla rápida:** usa `val` por defecto y `var` solo cuando necesites reasignar el valor.
+**Regla importante:** usa `val` por defecto y `var` solo cuando necesites reasignar.
 
 ---
 
@@ -53,7 +53,7 @@ println(puntuacion) // 15
 | `String` | `"Hola"` | Texto |
 | `Boolean` | `true`, `false` | Verdadero o falso |
 | `Char` | `'A'` | Un único carácter |
-| `Long` | `10000000000L` | Enteros grandes |
+| `Long` | `10000000000L` | Números enteros grandes |
 | `Unit` | `()` | Funciones que no devuelven un resultado útil |
 
 ```scala
@@ -75,15 +75,16 @@ val textoOtraVez = numero.toString
 println(s"Número: $numero, decimal: $decimal")
 ```
 
-Si el texto no representa un número válido, `toInt` puede producir un error. En ejercicios sencillos se suele asumir que el texto es correcto.
+Si el texto no representa un número válido, `toInt` puede producir un error.
 
 ### Interpolación de strings
 
-La `s` delante de una cadena permite insertar variables usando `$`.
+La letra `s` delante de una cadena permite insertar variables con `$`.
 
 ```scala
 val nombre = "Ana"
 val edad = 20
+
 println(s"Me llamo $nombre y tengo $edad años")
 println(s"El año que viene tendré ${edad + 1} años")
 ```
@@ -96,23 +97,25 @@ println(s"El año que viene tendré ${edad + 1} años")
 val a = 10
 val b = 3
 
-println(a + b)  // 13
-println(a - b)  // 7
-println(a * b)  // 30
-println(a / b)  // 3, división entera
-println(a % b)  // 1, resto
+println(a + b)  // 13: suma
+println(a - b)  // 7: resta
+println(a * b)  // 30: multiplicación
+println(a / b)  // 3: división entera
+println(a % b)  // 1: resto
 
 println(a == b) // igualdad
 println(a != b) // desigualdad
-println(a > b)
-println(a >= b)
+println(a > b)  // mayor que
+println(a >= b) // mayor o igual
+println(a < b)  // menor que
+println(a <= b) // menor o igual
 ```
 
-Los operadores lógicos más importantes son:
+Operadores lógicos:
 
-- `&&`: y
-- `||`: o
-- `!`: negación
+- `&&`: y; las dos condiciones deben ser verdaderas.
+- `||`: o; al menos una condición debe ser verdadera.
+- `!`: negación; cambia `true` por `false` y al revés.
 
 ```scala
 val tieneEntrada = true
@@ -123,11 +126,13 @@ if (tieneEntrada && esMayorDeEdad) {
 }
 ```
 
+Recuerda: `=` asigna un valor y `==` compara dos valores.
+
 ---
 
-## 4. Condicionales: tomando decisiones
+## 4. Condicionales: `if`, `else if` y `else`
 
-`if` y `else` permiten ejecutar código dependiendo de una condición. En Scala, un `if` también puede devolver un valor.
+Los condicionales permiten que el programa tome decisiones.
 
 ```scala
 val puntos = 25
@@ -141,20 +146,18 @@ if (puntos == 21) {
 }
 ```
 
-Como expresión:
+En Scala, un `if` también puede devolver un valor:
 
 ```scala
 val resultado = if (puntos <= 21) "válido" else "no válido"
 println(resultado)
 ```
 
-> En Scala se suele evitar el operador ternario de otros lenguajes (`condicion ? a : b`), porque `if (...) ... else ...` cumple esa función.
-
 ---
 
-## 5. Funciones (`def`): pequeñas fábricas de código
+## 5. Funciones (`def`)
 
-Una función recibe parámetros, realiza un trabajo y devuelve un resultado.
+Una función recibe datos, realiza un trabajo y devuelve un resultado. La última expresión del cuerpo se devuelve automáticamente.
 
 ```scala
 def comprobarMano(puntuacion: Int): Boolean = {
@@ -169,9 +172,7 @@ println(comprobarMano(20)) // true
 println(comprobarMano(25)) // false
 ```
 
-La última expresión del cuerpo se devuelve automáticamente. No hace falta escribir `return`.
-
-La función anterior puede escribirse de forma más corta:
+La función anterior se puede escribir de forma más corta:
 
 ```scala
 def comprobarManoCorta(puntuacion: Int): Boolean = puntuacion <= 21
@@ -186,7 +187,7 @@ val resultado = sumar(4, 6)
 println(resultado) // 10
 ```
 
-Una función que solo imprime tiene como resultado `Unit`:
+Una función que solo imprime devuelve `Unit`:
 
 ```scala
 def saludar(nombre: String): Unit = {
@@ -202,35 +203,32 @@ Las colecciones sirven para guardar varios datos juntos.
 
 ### `Array`: tamaño fijo
 
-Un `Array` mantiene su tamaño, pero sus posiciones se pueden modificar.
+El tamaño de un `Array` no cambia, pero podemos modificar sus posiciones. Los índices empiezan en `0`.
 
 ```scala
 val notas = Array(5, 7, 9)
 
-// Los índices empiezan en 0
 notas(0) = 6
 
-println(notas(0)) // 6
+println(notas(0))     // 6
 println(notas.length) // 3
 ```
 
-Un `Array` de tamaño 3 tiene las posiciones `0`, `1` y `2`. Intentar acceder a una posición inexistente produce un error.
+Un array de tamaño 3 tiene las posiciones `0`, `1` y `2`. Acceder a otra posición produce un error.
 
 ### `List`: colección inmutable
 
-Las listas normales son inmutables. Al “añadir” un elemento, se crea una lista nueva.
+Una `List` normal no se modifica. Cuando añadimos un elemento, se crea otra lista.
 
 ```scala
 val numeros = List(10, 20, 30)
 
-println(numeros.head) // 10, primer elemento
-println(numeros.tail) // List(20, 30), resto de elementos
+println(numeros.head)   // 10: primer elemento
+println(numeros.tail)   // List(20, 30): resto
 println(numeros.length) // 3
 ```
 
-#### Crear una lista progresivamente
-
-Para actualizar una referencia durante un ejercicio, se puede usar `var`:
+Para construir una lista progresivamente podemos usar `var`:
 
 ```scala
 var misNumeros = List[Int]()
@@ -241,14 +239,14 @@ misNumeros = misNumeros :+ 20
 println(misNumeros) // List(10, 20)
 ```
 
-> `:+` añade al final, pero en listas grandes puede ser menos eficiente. El operador `::` añade al principio y es la forma habitual en Scala:
+`:+` añade al final. `::` añade al principio y suele ser más eficiente:
 
 ```scala
 val lista = 30 :: 20 :: 10 :: Nil
 println(lista) // List(30, 20, 10)
 ```
 
-También se pueden concatenar listas:
+Para unir listas usamos `++`:
 
 ```scala
 val primera = List(1, 2)
@@ -260,8 +258,6 @@ println(completa) // List(1, 2, 3, 4)
 
 ### `map`, `filter` y `foreach`
 
-Estas operaciones son muy habituales porque evitan modificar variables manualmente.
-
 ```scala
 val numeros = List(1, 2, 3, 4, 5)
 
@@ -272,9 +268,9 @@ println(duplicados) // List(2, 4, 6, 8, 10)
 println(pares)      // List(2, 4)
 ```
 
-- `map` transforma todos los elementos.
+- `map` transforma todos los elementos y devuelve una colección nueva.
 - `filter` conserva solo los elementos que cumplen una condición.
-- `foreach` recorre los elementos para ejecutar una acción y no crea una nueva colección.
+- `foreach` recorre los elementos para ejecutar una acción y no devuelve una colección nueva.
 
 ---
 
@@ -282,7 +278,7 @@ println(pares)      // List(2, 4)
 
 ### Bucle `while`: control manual
 
-Hay que crear un contador que empiece en `0` y aumentarlo en cada vuelta.
+Necesitamos un índice y debemos aumentarlo en cada vuelta. Si olvidamos `i += 1`, el bucle puede ser infinito.
 
 ```scala
 val arrayNumeros = Array(10, 20, 30)
@@ -290,13 +286,13 @@ var i = 0
 
 while (i < arrayNumeros.length) {
   println(arrayNumeros(i))
-  i += 1 // Si se olvida, el bucle será infinito
+  i += 1
 }
 ```
 
-### Bucle `foreach`: control automático
+### Bucle `foreach`: recorrer sin índice
 
-Recorre cada elemento sin necesitar un índice.
+`foreach` coge cada elemento de la colección, uno por uno, y lo guarda temporalmente en la variable que escribimos antes de `=>`. No hay que crear un contador.
 
 ```scala
 val listaNombres = List("Ana", "Luis", "Marta")
@@ -306,15 +302,29 @@ listaNombres.foreach { nombre =>
 }
 ```
 
-También puede escribirse con una expresión corta:
+En cada vuelta ocurre lo siguiente:
+
+1. Primera vuelta: `nombre` vale `"Ana"`.
+2. Segunda vuelta: `nombre` vale `"Luis"`.
+3. Tercera vuelta: `nombre` vale `"Marta"`.
+
+También se puede escribir en una sola línea:
 
 ```scala
 listaNombres.foreach(nombre => println(s"Hola, $nombre"))
 ```
 
-### Bucle `for`
+Con una función ya existente podemos usar la sintaxis abreviada `_`:
 
-Es útil cuando queremos recorrer colecciones de forma clara:
+```scala
+List(1, 2, 3).foreach(numero => println(numero))
+```
+
+La forma anterior es más clara para principiantes. En un `foreach` no podemos usar `break` de la misma manera que en algunos lenguajes; normalmente filtramos antes o usamos otro tipo de bucle.
+
+### `for`: recorrer una colección
+
+`for` también recorre los elementos, pero suele ser más cómodo cuando necesitamos condiciones o crear una colección nueva.
 
 ```scala
 for (nombre <- listaNombres) {
@@ -322,7 +332,9 @@ for (nombre <- listaNombres) {
 }
 ```
 
-Se puede añadir una condición, llamada guardia:
+La variable `nombre` toma el valor de cada elemento, igual que en `foreach`.
+
+Podemos añadir una condición, llamada guardia:
 
 ```scala
 for (numero <- 1 to 10 if numero % 2 == 0) {
@@ -333,7 +345,52 @@ for (numero <- 1 to 10 if numero % 2 == 0) {
 - `1 to 10` incluye el `10`.
 - `1 until 10` llega hasta `9` y no incluye el `10`.
 
-Un `for` también puede crear una colección con `yield`:
+### `for` con dos listas sin usar `zip`
+
+Si tenemos dos listas relacionadas, por ejemplo nombres y alturas, podemos usar el índice. Las dos listas deben tener el mismo tamaño.
+
+```scala
+val nombres = List("Ana", "Luis", "Marta")
+val alturas = List(1.65, 1.80, 1.70)
+
+for (i <- nombres.indices) {
+  println(s"${nombres(i)} mide ${alturas(i)} metros")
+}
+```
+
+`nombres.indices` genera los índices `0`, `1` y `2`. En cada vuelta usamos el mismo índice `i` para obtener el nombre y la altura que están en la misma posición.
+
+Otra forma equivalente es:
+
+```scala
+for (i <- 0 until nombres.length) {
+  println(s"Nombre: ${nombres(i)}, altura: ${alturas(i)}")
+}
+```
+
+> Es importante que las dos listas tengan la misma longitud. Si una es más corta, intentar acceder a una posición inexistente produce un error.
+
+### `for` con dos listas usando `zip`
+
+`zip` une los elementos de dos listas en parejas. Así el `for` recibe directamente el nombre y la altura.
+
+```scala
+for ((nombre, altura) <- nombres.zip(alturas)) {
+  println(s"$nombre mide $altura metros")
+}
+```
+
+`nombres.zip(alturas)` produce parejas como estas:
+
+```scala
+List(("Ana", 1.65), ("Luis", 1.80), ("Marta", 1.70))
+```
+
+Si las listas tienen diferente longitud, `zip` solo utiliza las parejas que existen en las dos listas.
+
+### `for` con `yield`
+
+`yield` crea una colección nueva con el resultado de cada vuelta:
 
 ```scala
 val cuadrados = for (numero <- 1 to 5) yield numero * numero
@@ -342,59 +399,51 @@ println(cuadrados) // Vector(1, 4, 9, 16, 25)
 
 ---
 
-## 8. `match`: alternativa clara a muchos `if`
+## 8. `match`: alternativa a muchos `if`
 
-`match` permite comparar un valor con varios casos.
+`match` compara un valor con varios casos.
 
 ```scala
 val nota = 8
 
 val calificacion = nota match {
-  case 10 => "Matrícula"
-  case 9   => "Sobresaliente"
-  case 7 | 8 => "Notable"
-  case _   => "Necesita mejorar"
+  case 10      => "Matrícula"
+  case 9        => "Sobresaliente"
+  case 7 | 8   => "Notable"
+  case _        => "Necesita mejorar"
 }
 
 println(calificacion)
 ```
 
-El caso `_` significa “cualquier otro valor” y funciona como caso por defecto.
+`case _` significa “cualquier otro caso” y funciona como caso por defecto.
 
 ---
 
-## 9. Ejercicio final de examen: todo junto
+## 9. Ejercicio final de examen
 
-**Objetivo:** tenemos un `Array` con los puntos de varios jugadores. Hay que recorrerlo con un `while`. Si los puntos son válidos (menores o iguales que `21`), se guardan en una lista nueva y se suman a un total general.
+**Objetivo:** recorrer un `Array` con `while`, guardar en una lista las puntuaciones menores o iguales que `21` y sumarlas.
 
 ```scala
 object RepasoExamen extends App {
 
-  // 1. Datos iniciales
   val puntuaciones = Array(15, 25, 19, 22, 21, 14)
 
-  // 2. Variables de trabajo
   var i = 0
   var puntuacionesValidas = List[Int]()
   var sumaTotal = 0
 
-  // 3. Recorremos el Array
   while (i < puntuaciones.length) {
-
-    // Obtenemos el elemento de la posición actual
     val puntoActual = puntuaciones(i)
 
-    // 4. Comprobamos si es válido
     if (puntoActual <= 21) {
       puntuacionesValidas = puntuacionesValidas :+ puntoActual
       sumaTotal += puntoActual
     }
 
-    // 5. Avanzamos a la siguiente posición
     i += 1
   }
 
-  // 6. Mostramos los resultados
   println(s"Lista de puntuaciones válidas: $puntuacionesValidas")
   println(s"Suma total de las válidas: $sumaTotal")
 }
@@ -411,24 +460,28 @@ Suma total de las válidas: 69
 
 ## 10. Errores típicos de examen
 
-1. **Olvidar que los índices empiezan en `0`.** En un `Array` de longitud `3`, la última posición es `2`.
-2. **Olvidar `i += 1` en un `while`.** Esto puede crear un bucle infinito.
-3. **Intentar reasignar un `val`.** Si un dato cambia, hay que usar `var` o, mejor aún, crear una nueva colección.
-4. **Confundir `=` con `==`.** `=` se usa para asignar; `==` para comparar.
-5. **Olvidar el tipo de una lista vacía.** `List[Int]()` deja claro que guardará enteros.
-6. **Confundir `Array` y `List`.** El contenido de un `Array` puede cambiar; una `List` normal es inmutable.
-7. **Usar `&&` cuando se quiere decir “o”.** Para “o” se usa `||`.
-8. **No poner llaves o paréntesis correctamente.** Revisa siempre que cada `{` tenga su `}` y cada `(` su `)`. 
-9. **Confundir `:` con `=` en una declaración.** Por ejemplo: `val edad: Int = 20`.
-10. **Usar `return` innecesariamente.** Normalmente Scala devuelve automáticamente la última expresión de una función.
+1. Los índices empiezan en `0`, no en `1`.
+2. En un `while`, no olvides aumentar el contador.
+3. Un `val` no se puede reasignar.
+4. `=` asigna y `==` compara.
+5. Una lista vacía puede necesitar tipo: `List[Int]()`.
+6. Un `Array` permite cambiar posiciones; una `List` normal no.
+7. `&&` significa “y”; `||` significa “o”.
+8. Revisa que cada `{` tenga su `}` y cada `(` tenga su `)`.
+9. En una declaración, el tipo va después de `:`: `val edad: Int = 20`.
+10. Scala devuelve automáticamente la última expresión de una función.
+11. Si relacionas dos listas por índice, comprueba que tengan el mismo tamaño.
+12. Con `zip`, recuerda que se trabaja con parejas: `(nombre, altura)`.
+13. En `foreach`, la variable antes de `=>` representa el elemento actual.
+14. `foreach` sirve para ejecutar una acción; `map` sirve para transformar y guardar resultados.
 
 ---
 
 ## 11. Chuleta rápida
 
 ```scala
-val fijo = 10                    // no se puede reasignar
-var cambia = 10                  // sí se puede reasignar
+val fijo = 10
+var cambia = 10
 
 if (condicion) { ... } else { ... }
 
@@ -445,9 +498,17 @@ for (elemento <- lista) {
   println(elemento)
 }
 
+for (i <- nombres.indices) {
+  println(nombres(i))
+}
+
+for ((nombre, altura) <- nombres.zip(alturas)) {
+  println(s"$nombre mide $altura")
+}
+
 while (condicion) {
   // código
 }
 ```
 
-La idea fundamental es: **preferir `val`, usar colecciones inmutables cuando sea posible y dejar `var` y `while` para los ejercicios en los que el control manual sea necesario.**
+**Resumen:** usa `val` siempre que puedas; usa `if` para decidir; `foreach` y `for` para recorrer; `map` para transformar; `filter` para seleccionar; y `while` cuando necesites controlar manualmente el índice.
