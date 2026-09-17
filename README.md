@@ -274,6 +274,32 @@ println(pares)      // List(2, 4)
 
 ---
 
+### ¿Cómo crear colecciones VACÍAS para llenarlas después?
+
+**1. Crear una Lista vacía y llenarla:**
+Como las listas pueden crecer, la creamos como `var` y sin tamaño inicial. Luego usamos `:+` para añadir al final.
+```scala
+var listaVacia = List[Int]() // Lista vacía preparada para enteros
+
+listaVacia = listaVacia :+ 10
+listaVacia = listaVacia :+ 20
+// Resultado: List(10, 20)
+
+```
+
+**2. Crear un Array "vacío" y llenarlo:
+Como los Arrays no pueden cambiar de tamaño, no puedes crear uno de tamaño 0 y añadirle cosas. Tienes que crearlo indicando cuántos "huecos" necesitas usar (por ejemplo, 5 huecos). Al principio se llenará de ceros, y luego tú cambias esos ceros por tus datos.
+
+```Scala
+// Crea un Array de 5 huecos. Por defecto estará lleno de ceros: Array(0, 0, 0, 0, 0)
+val miArray = new Array[Int](5) 
+
+// Ahora lo vamos llenando indicando la posición (el índice empieza en 0)
+miArray(0) = 15
+miArray(1) = 22
+
+// Las posiciones 2, 3 y 4 seguirán valiendo 0 hasta que las cambies
+```
 ## 7. Bucles: repitiendo acciones
 
 ### Bucle `while`: control manual
@@ -287,6 +313,19 @@ var i = 0
 while (i < arrayNumeros.length) {
   println(arrayNumeros(i))
   i += 1
+}
+```
+
+```scala
+val nombres = List("Ana", "Luis", "Marta")
+val notas = List(8, 7, 10)
+
+// .indices genera los números de las posiciones (0, 1, 2...)
+nombres.indices.foreach { i => 
+  val nombreActual = nombres(i)
+  val notaActual = notas(i)
+  
+  println(s"El alumno $nombreActual ha sacado un $notaActual")
 }
 ```
 
