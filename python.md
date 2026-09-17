@@ -21,642 +21,227 @@
 11. [Programación orientada a objetos](#11-programación-orientada-a-objetos)
 12. [Errores frecuentes de examen](#12-errores-frecuentes-de-examen)
 13. [Chuleta final](#13-chuleta-final)
+14. [Práctica 3 — soluciones](#14-práctica-3--soluciones)
 
 ---
 
-## 1. Primer programa y sintaxis
+## 14. Práctica 3 — soluciones
 
-Python ejecuta las instrucciones de arriba abajo. A diferencia de otros lenguajes, **la indentación forma parte de la sintaxis**: normalmente se utilizan cuatro espacios.
-
-```python
-# Esto es un comentario: Python no lo ejecuta.
-print("¡Hola, mundo!")
-
-if True:
-    print("Este bloque está indentado")
-```
-
-### Reglas básicas
-
-- Las instrucciones dentro del mismo bloque deben tener la misma indentación.
-- No es necesario escribir `;` al final de cada línea.
-- Los nombres distinguen mayúsculas y minúsculas: `nombre` y `Nombre` son diferentes.
-- Usa nombres descriptivos en `snake_case`: `nota_media`, `numero_alumnos`.
-- Las constantes se suelen escribir en mayúsculas: `PI = 3.1416`.
-
----
-
-## 2. Variables y tipos de datos
-
-Una variable es un nombre que referencia un valor. Python **infiere el tipo automáticamente**, por lo que no hay que declararlo antes.
+### Ejercicio 1 — Catálogo de productos
 
 ```python
-nombre = "Ana"       # str: texto
-edad = 20             # int: entero
-altura = 1.68         # float: decimal
-aprobado = True       # bool: verdadero o falso
-sin_dato = None       # ausencia de valor
+catalogo = [
+    "Auriculares BT", 59.90, "Smartwatch S2", 149.00,
+    "Tablet 10", 219.00, "Cargador USB-C", 18.50,
+    "Cafetera Expres", 189.00, "Robot Aspirador", 279.00,
+]
 
-print(type(edad))     # <class 'int'>
+print("Total de elementos:", len(catalogo))
+print("Productos:", len(catalogo) // 2)
+nombres = catalogo[0::2]
+precios = catalogo[1::2]
+idx_robot = catalogo.index("Robot Aspirador")
+print("Precio robot:", catalogo[idx_robot + 1])
+ultimos_tres_nombres = nombres[-3:]
+print("Últimos tres:", ultimos_tres_nombres)
+print("Precio medio:", round(sum(precios) / len(precios), 2))
 ```
 
-> `=` asigna un valor. `==` compara dos valores.
-
-### Conversión de tipos
+### Ejercicio 2 — Inventario y listas anidadas
 
 ```python
-texto = "25"
-numero = int(texto)
-decimal = float(numero)
-otro_texto = str(decimal)
+inventario = [
+    ["ALM-NORTE", "Robot Aspirador", 34, 201.50],
+    ["ALM-NORTE", "Monitor 27", 58, 142.00],
+    ["ALM-SUR", "Silla Ergonomica", 12, 178.90],
+    ["ALM-SUR", "Robot Aspirador", 7, 201.50],
+    ["ALM-ESTE", "Cafetera Expres", 41, 131.20],
+    ["ALM-ESTE", "Monitor 27", 25, 142.00],
+]
 
-print(numero + 5)     # 30
+print(inventario[3][1])
+valor_stock = [[fila[1], round(fila[2] * fila[3], 2)] for fila in inventario]
+print(valor_stock)
+print("Total:", round(sum(valor for _, valor in valor_stock), 2))
+alm_sur = inventario[2:4]
+print("ALM-SUR:", round(sum(fila[2] * fila[3] for fila in alm_sur), 2))
 ```
 
-Si el texto no representa un número válido, `int()` o `float()` producen `ValueError`.
+> Si las filas de los almacenes dejan de estar contiguas, un slicing basado en posiciones seleccionará datos incorrectos. Para filtrar de forma robusta hay que comprobar el contenido de la columna, por ejemplo mediante una condición.
 
-### Entrada por teclado
-
-`input()` **siempre devuelve un texto**, aunque el usuario escriba un número.
+### Ejercicio 3 — Copias y referencias
 
 ```python
-nombre = input("Nombre: ")
-edad = int(input("Edad: "))
+precios_originales = [59.90, 149.00, 219.00, 18.50, 189.00, 279.00]
+precios_rebajados = precios_originales
+precios_rebajados[0] = 49.90
+print(precios_originales, precios_rebajados)  # Es la misma lista.
 
-print(f"{nombre} tiene {edad} años")
+precios_originales[0] = 59.90
+copia_list = list(precios_originales)
+copia_slice = precios_originales[:]
+copia_list[0] = 9.99
+for i in range(len(copia_list)):
+    copia_list[i] = round(copia_list[i] * 0.90, 2)
+copia_list.extend([12.50, 45.00])
+copia_list.insert(2, 99.00)
+del copia_list[4]
+descartado = copia_list.pop()
+print(id(precios_originales), id(copia_list), id(copia_slice))
 ```
 
----
-
-## 3. Operadores
-
-### Aritméticos
-
-| Operador | Significado | Ejemplo | Resultado |
-|---|---|---:|---:|
-| `+` | suma | `7 + 2` | `9` |
-| `-` | resta | `7 - 2` | `5` |
-| `*` | multiplicación | `7 * 2` | `14` |
-| `/` | división decimal | `7 / 2` | `3.5` |
-| `//` | división entera | `7 // 2` | `3` |
-| `%` | resto | `7 % 2` | `1` |
-| `**` | potencia | `2 ** 3` | `8` |
-
-El operador `%` es especialmente útil para saber si un número es par:
+### Ejercicio 4 — Cola de pedidos
 
 ```python
-numero = 14
-es_par = numero % 2 == 0
+cola = ["PED-10021", "PED-10007", "PED-10044", "PED-10012", "PED-10033", "PED-10008"]
+cola_invertida = cola[::-1]
+cola_ordenada = sorted(cola)
+cola.sort(reverse=True)
+atendidos = [cola.pop(0), cola.pop(0)]
+cola.insert(0, "PED-99999")
+total_historico = len(atendidos) + len(cola)
+avance_pct = round(len(atendidos) / total_historico * 100, 1)
+print(len(atendidos), cola, f"{avance_pct}%")
 ```
 
-### Comparación y lógica
+### Ejercicio 5 — Funciones e importes
 
 ```python
-edad >= 18       # mayor o igual
-nota == 10       # igualdad
-nombre != ""     # distinto
+def calcular_importe(unidades, precio_unitario, descuento_pct=0):
+    """Devuelve el importe neto redondeado a dos decimales."""
+    bruto = unidades * precio_unitario
+    return round(bruto * (1 - descuento_pct / 100), 2)
 
-# and: todas las condiciones deben cumplirse
-# or: basta con que se cumpla una
-# not: invierte el resultado
-puede_entrar = edad >= 18 and tiene_entrada
+
+def resumen_pedido(unidades, precio_unitario, descuento_pct=0):
+    """Devuelve importe bruto, ahorro e importe neto."""
+    bruto = unidades * precio_unitario
+    ahorro = bruto * descuento_pct / 100
+    return round(bruto, 2), round(ahorro, 2), round(bruto - ahorro, 2)
+
+bruto, ahorro, neto = resumen_pedido(
+    unidades=3, precio_unitario=59.90, descuento_pct=10
+)
+help(calcular_importe)
+pedidos = [(3, 59.90, 10), (1, 279, 0), (5, 18.50, 20), (2, 149, 5), (4, 89.90, 15)]
+importes = [calcular_importe(*pedido) for pedido in pedidos]
+print(max(importes), min(importes), sorted(importes), len(importes))
 ```
 
-### Asignación abreviada
+### Ejercicio 6 — Normalización de SKU
 
 ```python
-contador = 0
-contador += 1    # contador = contador + 1
-contador *= 2    # contador = contador * 2
+skus_crudos = ["  elc-0012-es ", "HOG-0045-ES", "dep-0003-pt  ", "ofi-0021-es", "  ELC-0012-ES", "hog-0099-fr "]
+skus_limpios = [sku.strip().upper() for sku in skus_crudos]
+print(skus_limpios.count("ELC-0012-ES"))
+print(skus_limpios.index("OFI-0021-ES"))
+partes_sku = [sku.split("-") for sku in skus_limpios]
+skus_es = [sku.replace("-", ".") for sku in skus_limpios if sku.endswith("-ES")]
+print(" | ".join(skus_limpios))
 ```
 
----
-
-## 4. Condicionales
-
-Los condicionales permiten ejecutar un bloque solo cuando se cumple una condición.
+### Ejercicios 7–11 — NumPy y aleatoriedad
 
 ```python
-nota = 7.5
+import math
+from math import ceil
+import random
+import numpy as np
 
-if nota >= 9:
-    resultado = "Sobresaliente"
-elif nota >= 5:
-    resultado = "Aprobado"
-else:
-    resultado = "Suspenso"
+print(math.sqrt(2809), ceil(1375 / 24))
+random.seed(42)
+print([random.randint(1, 5) for _ in range(10)])
 
-print(resultado)
+unidades = np.array([3, 1, 5, 2, 4, 6, 2, 8, 3, 1])
+precios = np.array([59.90, 279, 18.50, 149, 89.90, 27.50, 219, 14.90, 64, 239])
+importes = unidades * precios
+caros = precios > 100
+print(importes.sum(), importes * 1.04)
+print(precios[caros], importes[caros], np.where(caros))
+seleccion = (precios > 100) & (unidades >= 2)
+
+ventas_2d = np.array([
+    [15200.50, 11800.25, 12950, 9870.40, 13400.10],
+    [16840.75, 12310.60, 13480.90, 11020.35, 14100.80],
+    [12535.72, 10663.06, 11221.59, 12673.08, 12334.38],
+])
+print(ventas_2d.shape, ventas_2d.ndim, ventas_2d.size)
+print(ventas_2d.sum(axis=1), ventas_2d.sum(axis=0))
+ventas_2d = np.vstack((ventas_2d, ventas_2d[2] * 1.06))
+
+rng = np.random.default_rng(2024)
+temperatura = rng.normal(68, 6.5, 500)
+vibracion = np.abs(rng.normal(2.4, 0.8, 500))
+media, mediana, desviacion = temperatura.mean(), np.median(temperatura), temperatura.std()
+print(media, mediana, desviacion, temperatura.min(), temperatura.max())
+print(np.percentile(vibracion, [25, 50, 75, 95]))
+print(np.corrcoef(temperatura, vibracion))
+umbral = media + 2 * desviacion
+print((temperatura > umbral).sum())
 ```
 
-Python evalúa las condiciones en orden y ejecuta **solo el primer bloque verdadero**.
+Fijar la semilla inicializa el generador pseudoaleatorio en el mismo estado. Así, cualquier persona puede reproducir los mismos datos y verificar las métricas obtenidas.
 
-### Condición en una sola línea
+### Ejercicios 12–15 — Diccionarios y pandas
 
 ```python
-edad = 20
-mensaje = "mayor de edad" if edad >= 18 else "menor de edad"
+import pandas as pd
+
+tarifas_envio = {"Norte": 4.95, "Sur": 5.50, "Este": 5.20, "Oeste": 6.10, "Centro": 3.90}
+print(tarifas_envio["Este"])
+tarifas_envio["Insular"] = 9.80
+tarifas_envio["Oeste"] = 5.95
+del tarifas_envio["Sur"]
+for region, tarifa in tarifas_envio.items():
+    print(f"{region} -> {tarifa:.2f} €")
+
+almacenes = pd.DataFrame({
+    "codigo": ["ALM-NORTE", "ALM-SUR", "ALM-ESTE", "ALM-OESTE", "ALM-CENTRO"],
+    "ciudad": ["Bilbao", "Sevilla", "Valencia", "Vigo", "Madrid"],
+    "m2": [4200, 3100, 3800, 2600, 6500],
+    "operarios": [48, 31, 39, 22, 74],
+}).set_index("codigo")
+
+ventas = pd.read_csv("../data/ventas_retail.csv")
+ventas["importe_bruto"] = ventas["unidades"] * ventas["precio_unitario"]
+ventas["importe_neto"] = (ventas["importe_bruto"] * (1 - ventas["descuento_pct"] / 100)).round(2)
+ventas["ticket_medio"] = (ventas["importe_neto"] / ventas["unidades"]).round(2)
+agrup_region = ventas.groupby("region")["importe_neto"].sum().sort_values(ascending=False)
+top_5 = ventas.groupby("producto")["importe_neto"].sum().nlargest(5)
+ventas["satisfaccion"] = ventas["satisfaccion"].fillna(ventas["satisfaccion"].median())
+ventas["canal"] = ventas["canal"].fillna("Desconocido")
 ```
 
-Úsala solo para expresiones sencillas; si la decisión es compleja, es más legible usar `if` normal.
-
-### Valores considerados falsos
-
-Python interpreta como falso (`False`) valores como `0`, `""`, `[]`, `{}`, `None` y `False`.
+### Ejercicios 16–20 — Booleanos, funciones, filtros y bucles
 
 ```python
-nombre = input("Nombre: ")
-if nombre:
-    print(f"Hola, {nombre}")
-else:
-    print("No has escrito ningún nombre")
+def nivel_riesgo(temperatura):
+    if temperatura > 85:
+        return "CRÍTICO"
+    if temperatura > 76:
+        return "ALTO"
+    if temperatura > 70:
+        return "MEDIO"
+    return "BAJO"
+
+filtro = (ventas["canal"] == "Online") & (ventas["importe_neto"] > 500)
+ventas_online = ventas[filtro]
+ventas_region = ventas[ventas["region"].isin(["Norte", "Centro"])]
+ventas_descuento = ventas[ventas["descuento_pct"].between(10, 20)]
+ventas_electronica = ventas[
+    (ventas["categoria"] == "Electronica")
+    & (ventas["unidades"] > 2)
+    & (ventas["descuento_pct"] != 0)
+]
+ventas_no_oficina = ventas[~(ventas["categoria"] == "Oficina")]
+ventas_online_query = ventas.query("canal == 'Online' and importe_neto > 500")
+
+for _, fila in ventas.head(5).iterrows():
+    print(f"{fila['region']} | {fila['producto']} | {fila['importe_neto']} €")
+ventas["codigo_region"] = ventas["region"].str[:3].str.upper()
+ventas["segmento_ticket"] = ventas["importe_neto"].apply(
+    lambda importe: "Bajo" if importe < 100 else "Medio" if importe < 400 else "Alto"
+)
 ```
 
----
-
-## 5. Bucles
-
-### `for`: recorrer una colección o un rango
-
-```python
-for numero in range(1, 6):
-    print(numero)
-```
-
-`range(inicio, fin, paso)` incluye `inicio`, pero **no incluye `fin`**.
-
-```python
-range(5)          # 0, 1, 2, 3, 4
-range(2, 10, 2)   # 2, 4, 6, 8
-range(5, 0, -1)   # 5, 4, 3, 2, 1
-```
-
-### `while`: repetir mientras se cumpla una condición
-
-```python
-i = 1
-while i <= 5:
-    print(i)
-    i += 1  # imprescindible para evitar un bucle infinito
-```
-
-Usa `for` cuando conozcas o puedas recorrer una secuencia; usa `while` cuando la repetición dependa de una condición que cambia durante el programa.
-
-### `break` y `continue`
-
-```python
-for numero in range(1, 11):
-    if numero == 7:
-        break       # termina el bucle completo
-    if numero % 2 == 0:
-        continue    # salta a la siguiente vuelta
-    print(numero)   # 1, 3, 5
-```
-
-### `else` en bucles
-
-El `else` se ejecuta si el bucle termina normalmente, es decir, si no se ha usado `break`.
-
-```python
-for numero in range(2, 10):
-    if numero == 5:
-        print("Encontrado")
-        break
-else:
-    print("No encontrado")
-```
-
-### `enumerate`: elemento e índice
-
-```python
-nombres = ["Ana", "Luis", "Marta"]
-
-for indice, nombre in enumerate(nombres, start=1):
-    print(f"{indice}. {nombre}")
-```
-
-Es más claro y seguro que mantener un contador manual.
-
----
-
-## 6. Colecciones
-
-### 6.1 Listas: ordenadas y modificables
-
-Una lista puede contener valores repetidos y sus elementos se pueden cambiar.
-
-```python
-notas = [5, 8, 10, 6]
-
-notas.append(9)          # añade al final
-notas.insert(1, 7)       # inserta en una posición
-notas.extend([4, 6])     # añade varios elementos
-notas.remove(5)          # elimina la primera aparición del valor
-ultima = notas.pop()     # elimina y devuelve el último elemento
-
-print(notas[0])          # primer elemento
-print(notas[-1])         # último elemento
-print(notas[1:4])        # desde 1 incluido hasta 4 excluido
-```
-
-> Los índices empiezan en `0`. Acceder a una posición inexistente produce `IndexError`.
-
-Operaciones útiles:
-
-```python
-len(notas)       # número de elementos
-sum(notas)       # suma
-min(notas)       # mínimo
-max(notas)       # máximo
-sorted(notas)    # nueva lista ordenada
-notas.sort()     # ordena la lista original
-```
-
-### Comprensión de listas
-
-Permite crear una lista aplicando una expresión a cada elemento, opcionalmente con una condición.
-
-```python
-numeros = range(1, 6)
-cuadrados = [numero ** 2 for numero in numeros]
-pares = [numero for numero in numeros if numero % 2 == 0]
-
-# Equivale a:
-pares_largos = []
-for numero in numeros:
-    if numero % 2 == 0:
-        pares_largos.append(numero)
-```
-
-### 6.2 Tuplas: agrupaciones inmutables
-
-Una tupla se parece a una lista, pero no puede modificarse después de crearla.
-
-```python
-coordenada = (10, 20)
-x, y = coordenada  # desempaquetado
-
-# coordenada[0] = 5  # TypeError
-```
-
-Úsala para datos que representan una unidad fija o cuando quieres impedir modificaciones accidentales.
-
-### 6.3 Diccionarios: clave y valor
-
-Un diccionario relaciona cada clave con un valor. Las claves deben ser únicas.
-
-```python
-alumno = {
-    "nombre": "Ana",
-    "edad": 20,
-    "nota": 8.5,
-}
-
-print(alumno["nombre"])
-alumno["curso"] = "Python"  # crear una clave
-alumno["nota"] = 9           # modificar un valor
-```
-
-Para evitar un error si la clave no existe, usa `get()`:
-
-```python
-ciudad = alumno.get("ciudad", "Desconocida")
-
-for clave, valor in alumno.items():
-    print(f"{clave}: {valor}")
-```
-
-Otros métodos importantes: `keys()`, `values()`, `items()`, `pop()` y `update()`.
-
-Comprensión de diccionarios:
-
-```python
-cuadrados = {numero: numero ** 2 for numero in range(1, 5)}
-```
-
-### 6.4 Conjuntos (`set`): valores sin duplicados
-
-```python
-colores = {"rojo", "azul", "rojo"}
-print(colores)  # {'rojo', 'azul'}
-
-colores.add("verde")
-colores.discard("amarillo")  # no falla si no existe
-```
-
-Operaciones de conjuntos:
-
-```python
-a = {1, 2, 3}
-b = {3, 4, 5}
-
-print(a | b)  # unión
-print(a & b)  # intersección
-print(a - b)  # elementos de a que no están en b
-```
-
----
-
-## 7. Funciones
-
-Una función agrupa instrucciones reutilizables. Recibe parámetros y puede devolver un resultado con `return`.
-
-```python
-def calcular_media(notas):
-    """Devuelve la media de una lista de notas."""
-    return sum(notas) / len(notas)
-
-media = calcular_media([7, 8, 9])
-print(media)  # 8.0
-```
-
-Si una función no tiene `return`, devuelve `None` automáticamente.
-
-### Parámetros por posición y por nombre
-
-```python
-def presentar(nombre, saludo="Hola"):
-    return f"{saludo}, {nombre}"
-
-presentar("Ana")
-presentar(nombre="Luis", saludo="Buenos días")
-```
-
-Los parámetros con valor por defecto deben aparecer después de los obligatorios.
-
-### `*args` y `**kwargs`
-
-```python
-def sumar_todos(*numeros):
-    return sum(numeros)
-
-sumar_todos(1, 2, 3, 4)
-
-
-def mostrar_datos(**datos):
-    for clave, valor in datos.items():
-        print(clave, valor)
-
-mostrar_datos(nombre="Ana", edad=20)
-```
-
-- `*args` recibe varios argumentos posicionales en una tupla.
-- `**kwargs` recibe varios argumentos con nombre en un diccionario.
-
-### Ámbito de las variables
-
-Una variable creada dentro de una función es local. No depende de una variable externa con el mismo nombre.
-
-```python
-def duplicar(numero):
-    resultado = numero * 2  # solo existe dentro de la función
-    return resultado
-```
-
-Como regla general, es preferible pasar datos como parámetros y devolver resultados antes que usar variables globales.
-
-### Funciones lambda
-
-Una `lambda` es una función pequeña de una sola expresión:
-
-```python
-cuadrado = lambda numero: numero ** 2
-print(cuadrado(4))  # 16
-
-personas = [("Ana", 30), ("Luis", 20)]
-ordenadas = sorted(personas, key=lambda persona: persona[1])
-```
-
-Para funciones con varias instrucciones, usa `def`, que resulta más legible.
-
----
-
-## 8. Strings
-
-Los strings son secuencias de caracteres y no se pueden modificar directamente: son **inmutables**.
-
-```python
-texto = "  Python es útil  "
-
-texto = texto.strip()           # quita espacios laterales
-texto.lower()                   # minúsculas
-texto.upper()                   # mayúsculas
-texto.replace("útil", "potente")
-texto.startswith("Python")
-texto.endswith("útil")
-```
-
-### Formatear texto con f-strings
-
-```python
-nombre = "Ana"
-nota = 8.456
-print(f"{nombre} ha sacado un {nota:.2f}")
-```
-
-`:.2f` muestra un número decimal con dos posiciones.
-
-### Dividir y unir
-
-```python
-frase = "Python es sencillo"
-palabras = frase.split()              # ["Python", "es", "sencillo"]
-resultado = "-".join(palabras)        # "Python-es-sencillo"
-```
-
-### Recorrer un string
-
-```python
-vocales = 0
-for caracter in "programacion":
-    if caracter in "aeiou":
-        vocales += 1
-```
-
----
-
-## 9. Excepciones
-
-Una excepción es un error que ocurre durante la ejecución. Con `try` y `except` podemos controlarlo y mostrar un mensaje útil.
-
-```python
-try:
-    edad = int(input("Edad: "))
-    resultado = 100 / edad
-except ValueError:
-    print("Debes introducir un número entero")
-except ZeroDivisionError:
-    print("La edad no puede ser cero")
-else:
-    print(f"Resultado: {resultado}")
-finally:
-    print("Fin del programa")
-```
-
-- `try`: código que puede fallar.
-- `except`: respuesta a un tipo de error concreto.
-- `else`: se ejecuta si no hubo errores.
-- `finally`: se ejecuta siempre.
-
-Evita `except Exception` o un `except` vacío si no es necesario: puede ocultar errores reales.
-
-También puedes provocar una excepción de forma intencionada:
-
-```python
-def validar_edad(edad):
-    if edad < 0:
-        raise ValueError("La edad no puede ser negativa")
-```
-
----
-
-## 10. Ficheros
-
-La forma recomendada de trabajar con archivos es `with open(...)`, porque cierra el archivo automáticamente aunque ocurra un error.
-
-### Leer un archivo
-
-```python
-with open("datos.txt", "r", encoding="utf-8") as archivo:
-    contenido = archivo.read()
-
-# También se puede leer línea a línea:
-with open("datos.txt", encoding="utf-8") as archivo:
-    for linea in archivo:
-        print(linea.strip())
-```
-
-### Escribir y añadir
-
-```python
-with open("salida.txt", "w", encoding="utf-8") as archivo:
-    archivo.write("Primera línea\n")
-
-with open("salida.txt", "a", encoding="utf-8") as archivo:
-    archivo.write("Línea añadida\n")
-```
-
-- `r`: lectura.
-- `w`: escritura; sobrescribe el archivo si ya existe.
-- `a`: añade al final.
-
-### JSON
-
-```python
-import json
-
-persona = {"nombre": "Ana", "edad": 20}
-
-with open("persona.json", "w", encoding="utf-8") as archivo:
-    json.dump(persona, archivo, ensure_ascii=False, indent=2)
-
-with open("persona.json", encoding="utf-8") as archivo:
-    persona_leida = json.load(archivo)
-```
-
----
-
-## 11. Programación orientada a objetos
-
-Una **clase** define la estructura y el comportamiento de un tipo de objeto. Un **objeto** es una instancia concreta de esa clase.
-
-```python
-class Alumno:
-    def __init__(self, nombre, nota):
-        self.nombre = nombre
-        self.nota = nota
-
-    def esta_aprobado(self):
-        return self.nota >= 5
-
-    def __str__(self):
-        return f"{self.nombre}: {self.nota}"
-
-alumno = Alumno("Ana", 8.5)
-print(alumno)
-print(alumno.esta_aprobado())
-```
-
-- `__init__` se ejecuta al crear el objeto.
-- `self` representa al objeto actual y permite acceder a sus atributos y métodos.
-- Un atributo guarda datos; un método define una acción.
-
-### Herencia
-
-```python
-class AlumnoBecado(Alumno):
-    def __init__(self, nombre, nota, beca):
-        super().__init__(nombre, nota)
-        self.beca = beca
-```
-
-`super()` permite reutilizar el comportamiento de la clase padre.
-
----
-
-## 12. Errores frecuentes de examen
-
-1. **Olvidar que `input()` devuelve `str`:** convierte con `int()` o `float()`.
-2. **Confundir `=` y `==`:** el primero asigna; el segundo compara.
-3. **Usar `and`/`or` de forma incorrecta:** escribe las condiciones completas y usa paréntesis si hace falta.
-4. **Olvidar los dos puntos `:`** después de `if`, `for`, `while`, `def`, `class`, `try`, etc.
-5. **Indentación incorrecta:** todo el bloque debe tener la misma sangría.
-6. **Confundir `append` y `extend`:** `append([3, 4])` añade una lista como un único elemento; `extend([3, 4])` añade sus elementos.
-7. **Acceder a una clave inexistente:** usa `diccionario.get("clave")` si no estás seguro de que exista.
-8. **Confundir `sort()` y `sorted()`:** `sort()` modifica la lista; `sorted()` devuelve una nueva.
-9. **Modificar una lista mientras la recorres:** crea otra lista o recorre una copia.
-10. **Usar `while` sin actualizar la condición:** puede crear un bucle infinito.
-11. **Usar `is` para comparar valores:** utiliza `==`; `is` comprueba identidad y se reserva normalmente para `None`.
-12. **Usar un `except` demasiado general:** captura errores concretos para no ocultar fallos.
-13. **Olvidar `return`:** imprimir un resultado no es lo mismo que devolverlo.
-14. **Sobrescribir un fichero sin querer:** `"w"` borra el contenido anterior; usa `"a"` para añadir.
-
----
-
-## 13. Chuleta final
-
-```python
-# Variables y entrada
-nombre = input("Nombre: ")
-edad = int(input("Edad: "))
-
-# Condición
-if edad >= 18:
-    mensaje = "adulto"
-else:
-    mensaje = "menor"
-
-# Bucle
-for numero in range(5):
-    print(numero)
-
-# Lista y comprensión
-numeros = [1, 2, 3, 4]
-pares = [n for n in numeros if n % 2 == 0]
-
-# Diccionario
-persona = {"nombre": "Ana", "edad": 20}
-print(persona.get("ciudad", "sin ciudad"))
-
-# Función
-def doble(numero):
-    return numero * 2
-
-# Excepción
-try:
-    numero = int("10")
-except ValueError:
-    print("Valor no válido")
-
-# Fichero
-with open("datos.txt", encoding="utf-8") as archivo:
-    texto = archivo.read()
-```
-
-> **Método para resolver ejercicios:** 1) entiende qué datos entran; 2) elige la estructura adecuada; 3) separa la lógica en funciones; 4) prueba casos normales y casos límite; 5) revisa tipos, indentación y valores devueltos.
-
----
-
-## ✅ Resumen en una frase
-
-Usa **condicionales** para decidir, **bucles** para repetir, **listas/diccionarios** para organizar datos, **funciones** para reutilizar lógica y **excepciones** para controlar errores.
+La técnica `groupby("region")["importe_neto"].sum()` es preferible al bucle manual: expresa directamente la operación de agregación y suele ser más eficiente y legible para trabajar con DataFrames.
